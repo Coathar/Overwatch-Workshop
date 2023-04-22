@@ -96,6 +96,8 @@ Event.OngoingPlayer
 if (!IsOnObjective() && IsButtonHeld(EventPlayer(), Button.Melee))
 {
     Wait(10, WaitBehavior.AbortWhenFalse);
+    // This part is very hacky and still somewhat inconsistent. 
+    // The numbers I used were all guesses and what worked for me
     facePayloadEnd(EventPlayer());
     StartThrottleInDirection(EventPlayer(), FacingDirectionOf(EventPlayer()), throttleForMap());
     Wait(0.02, WaitBehavior.IgnoreCondition);
