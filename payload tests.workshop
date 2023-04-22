@@ -1,0 +1,157 @@
+import "customGameSettings.json";
+
+globalvar define heroArray = [
+    Hero.Ana,
+    Hero.Ashe,
+    Hero.Baptiste,
+    Hero.Bastion,
+    Hero.Brigitte, 
+    Hero.Doomfist, 
+    Hero.Dva, 
+    Hero.Echo, 
+    Hero.Genji, 
+    Hero.Hanzo, 
+    Hero.JunkerQueen, 
+    Hero.Junkrat, 
+    Hero.Kiriko,
+    Hero.Lifeweaver, 
+    Hero.Lucio, 
+    Hero.Mei, 
+    Hero.Mercy, 
+    Hero.Moira,
+    Hero.Orisa,
+    Hero.Pharah,
+    Hero.Ramattra,
+    Hero.Reaper,
+    Hero.Reinhardt,
+    Hero.Roadhog,
+    Hero.Sigma,
+    Hero.Sojourn,
+    Hero.Soldier76,
+    Hero.Sombra,
+    Hero.Symmetra,
+    Hero.Torbjorn,
+    Hero.Tracer,
+    Hero.Widowmaker,
+    Hero.Winston,
+    Hero.WreckingBall,
+    Hero.Zarya,
+    Hero.Zenyatta];
+
+rule: 'Skip Assembling heroes'
+Event.OngoingGlobal
+if (IsAssemblingHeroes())
+{
+    SetMatchTime(0);
+}
+
+rule: 'Skip Setup'
+Event.OngoingGlobal
+if (IsInSetup())
+{
+    SetMatchTime(5);
+}
+
+rule: 'Teleport to Point A'
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer(), Button.Interact))
+{
+    teleportToPointA(EventPlayer());
+}
+
+rule: 'Teleport to end'
+Event.OngoingPlayer
+if(IsButtonHeld(EventPlayer(), Button.Ultimate))
+{
+    // Teleport(PlayersInSlot(0, Team.Team2), Vector(-59.33, -0.40, 103.96));
+    facePayloadEnd(EventPlayer());
+    teleportToPayloadEnd(EventPlayer());
+}
+
+rule: 'Send Debug'
+Event.OngoingPlayer
+{
+    CreateHudText(EventPlayer(), "Player Location", PositionOf(EventPlayer()), "", Location.Left);
+    CreateHudText(EventPlayer(), "Player Vector", FacingDirectionOf(EventPlayer()), "", Location.Left);
+}
+
+rule: 'Swap Hero'
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer(), Button.Reload))
+{
+    Wait(1, WaitBehavior.AbortWhenFalse);
+    SetAllowedHeroes(EventPlayer(), RemoveFromArray(AllowedHeroes(EventPlayer()), HeroOf(EventPlayer())));
+    ResetHeroAvailability(EventPlayer());
+}
+
+rule: 'Set Point'
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer(), Button.Crouch))
+{
+    SetMatchTime(90000);
+}
+
+rule: 'Touch Point'
+Event.OngoingPlayer
+if (!IsOnObjective() && IsButtonHeld(EventPlayer(), Button.Melee))
+{
+    Wait(10, WaitBehavior.AbortWhenFalse);
+    facePayloadEnd(EventPlayer());
+    StartThrottleInDirection(EventPlayer(), FacingDirectionOf(EventPlayer()), throttleForMap());
+    Wait(0.02, WaitBehavior.IgnoreCondition);
+    PressButton(EventPlayer(), Button.Ability2);
+    Wait(0.1, WaitBehavior.IgnoreCondition);
+    StopThrottleInDirection(EventPlayer());
+}
+
+void facePayloadEnd(Player player) "Face Payload End"
+{
+    switch (CurrentMap())
+    {
+        case Map.Blizzard_World:
+            SetFacing(player, Vector(0.63, 0, 0.77));
+        case Map.Midtown:
+            SetFacing(player, Vector(1, 0, 0.0));
+        case Map.Eichenwalde:
+            SetFacing(player, Vector(0.25, 0, 0.97));
+    }
+}
+
+void teleportToPayloadEnd(Player player) "Teleport Payload End"
+{
+    switch (CurrentMap())
+    {
+        case Map.Blizzard_World:
+            Teleport(player, Vector(-59.30, -0.40, 103.99));
+        case Map.Midtown:
+            Teleport(player, Vector(56.11, 3.58, -22.06));
+        case Map.Eichenwalde:
+           Teleport(player, Vector(86.15, 12.66, -74.93));
+    }
+}
+
+void teleportToPointA(Player player) "Face Point A"
+{
+    switch (CurrentMap())
+    {
+        case Map.Blizzard_World:
+            Teleport(player, Vector(4.73, 1.90, 73.15));
+        case Map.Midtown:
+            Teleport(player, Vector(9.59, 4.72, 28.77));
+        case Map.Eichenwalde:
+           Teleport(player, Vector(11.17, 8.38, -73.12));
+    }
+}
+
+Number throttleForMap()
+{
+    switch (CurrentMap())
+    {
+        case Map.Midtown:
+            return 0.75;
+        case Map.Eichenwalde:
+            return 0.85;
+    }
+
+    return 0.5;
+}

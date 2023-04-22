@@ -1,0 +1,23 @@
+{
+    "Modes": {
+        "All": {
+            "Hero Limit": "Off",
+            "Limit Roles": "Off",
+            "Game Mode Start": "Immediately"
+        },
+        "Hybrid": {
+            "Enabled": true,
+            "Enabled Maps": [ "Eichenwalde" ],
+            "Capture Speed Modifier": 500
+        }
+    },
+    "Heroes": {
+        "General": {
+            "Tracer": {
+                "Blink Cooldown Time": 0,
+                "Recall Cooldown Time": 0
+            }
+        }
+    }
+}
+
