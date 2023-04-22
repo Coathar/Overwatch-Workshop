@@ -84,12 +84,20 @@ if (IsButtonHeld(EventPlayer(), Button.Reload))
     ResetHeroAvailability(EventPlayer());
 }
 
-rule: 'Set Point'
+rule: 'Set Match Time'
 Event.OngoingPlayer
 if (IsButtonHeld(EventPlayer(), Button.Crouch))
 {
     SetMatchTime(90000);
 }
+
+rule: 'End Match'
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer(), Button.Melee)  && IsButtonHeld(EventPlayer(), Button.Crouch))
+{
+    SetMatchTime(0);
+}
+
 
 rule: 'Touch Point'
 Event.OngoingPlayer
@@ -112,10 +120,59 @@ void facePayloadEnd(Player player) "Face Payload End"
     {
         case Map.Blizzard_World:
             SetFacing(player, Vector(0.63, 0, 0.77));
+            break;
         case Map.Midtown:
             SetFacing(player, Vector(1, 0, 0.0));
+            break;
         case Map.Eichenwalde:
             SetFacing(player, Vector(0.25, 0, 0.97));
+            break;
+        case Map.Numbani:
+            SetFacing(player, Vector(0.58, 0, -0.81));
+            break;
+        case Map.Kings_Row:
+            SetFacing(player, Vector(-0.98, 0, 0.17));
+            break;
+        case Map.Hollywood:
+            SetFacing(player, Vector(-0.47, 0, -0.88));
+            break;
+        case Map.Paraiso:
+            SetFacing(player, Vector(0.67, 0, -0.70));
+            break;
+        case Map.Rialto:
+            if (TeamScore(TeamOf(player)) == 0)
+            {
+                SetFacing(player, Vector(-1, 0, 0));
+            }
+            else if (TeamScore(TeamOf(player)) == 1)
+            {
+                SetFacing(player, Vector(-1, 0, 0));
+            }
+            break;
+        case Map.Dorado:
+            if (TeamScore(TeamOf(player)) == 0)
+            {
+                SetFacing(player, Vector(0.89, 0, 0.41));
+            }
+            else if (TeamScore(TeamOf(player)) == 1)
+            {
+                SetFacing(player, Vector(0.97, 0, 0.24));
+            }
+            else if (TeamScore(TeamOf(player)) == 2)
+            {
+                SetFacing(player, Vector(0.97, 0, 0.24));
+            }
+            break;
+        case Map.Junkertown:
+            if (TeamScore(TeamOf(player)) == 0)
+            {
+                SetFacing(player, Vector(-0.50, 0, -0.86));
+            }
+            else if (TeamScore(TeamOf(player)) == 1)
+            {
+                SetFacing(player, Vector(-0.20, 0, -0.98));
+            }
+            break;
     }
 }
 
@@ -125,23 +182,87 @@ void teleportToPayloadEnd(Player player) "Teleport Payload End"
     {
         case Map.Blizzard_World:
             Teleport(player, Vector(-59.30, -0.40, 103.99));
+            break;
         case Map.Midtown:
             Teleport(player, Vector(56.11, 3.58, -22.06));
+            break;
         case Map.Eichenwalde:
            Teleport(player, Vector(86.15, 12.66, -74.93));
+           break;
+        case Map.Numbani:
+           Teleport(player, Vector(147.68, -4.17, 15.74));
+           break;
+        case Map.Kings_Row:
+           Teleport(player, Vector(-93.11, 0.93, -9.77));
+           break;
+        case Map.Hollywood:
+           Teleport(player, Vector(5.24, 1.85, -69.49));
+           break;
+        case Map.Paraiso:
+           Teleport(player, Vector(4.02, 4.83, -85.87));
+           break;
+        case Map.Rialto:
+            if (TeamScore(TeamOf(player)) == 0)
+            {
+                Teleport(player, Vector(45.77, -0.40, -69.02));
+            }
+            else if (TeamScore(TeamOf(player)) == 1)
+            {
+                Teleport(player, Vector(-20.33, -1.40, -67.17));
+            }
+            break;
+        case Map.Dorado:
+            if (TeamScore(TeamOf(player)) == 0)
+            {
+                Teleport(player, Vector(66.58, 6.63, -15.21));
+            }
+            else if (TeamScore(TeamOf(player)) == 1)
+            {
+                Teleport(player, Vector(122.60, 10.83, 24.10));
+            }
+            else if (TeamScore(TeamOf(player)) == 2)
+            {
+                Teleport(player, Vector(139.12, 11, 28.22));
+            }
+            break;
+        case Map.Junkertown:
+            if (TeamScore(TeamOf(player)) == 0)
+            {
+                Teleport(player, Vector(-29.24, 4.43, -47.30));
+            }
+            else if (TeamScore(TeamOf(player)) == 1)
+            {
+                Teleport(player, Vector(-56.41, 7.26, -96.97));
+            }
+            break;
     }
 }
 
-void teleportToPointA(Player player) "Face Point A"
+void teleportToPointA(Player player) "Teleport to Point A"
 {
     switch (CurrentMap())
     {
         case Map.Blizzard_World:
             Teleport(player, Vector(4.73, 1.90, 73.15));
+            break;
         case Map.Midtown:
             Teleport(player, Vector(9.59, 4.72, 28.77));
+            break;
         case Map.Eichenwalde:
            Teleport(player, Vector(11.17, 8.38, -73.12));
+           break;
+        case Map.Numbani:
+           Teleport(player, Vector(86.58, 2.35, -2.07));
+           break;
+        case Map.Kings_Row:
+           Teleport(player, Vector(-15.11, 0.07, -36.38));
+           break;
+        case Map.Hollywood:
+           Teleport(player, Vector(-27.81, 3.46, -3.54));
+           break;
+        case Map.Paraiso:
+           Teleport(player, Vector(-8.53, 1.0, -12.26));
+           break;
     }
 }
 
@@ -152,7 +273,17 @@ Number throttleForMap()
         case Map.Midtown:
             return 0.75;
         case Map.Eichenwalde:
+        case Map.Kings_Row:
             return 0.85;
+        case Map.Rialto:
+            if (TeamScore(TeamOf(EventPlayer())) == 0)
+                return 1;
+        case Map.Dorado:
+            if (TeamScore(TeamOf(EventPlayer())) == 1)
+                return 1;
+        case Map.Junkertown:
+            if (TeamScore(TeamOf(EventPlayer())) == 0)
+                return 1;
     }
 
     return 0.5;

@@ -5,11 +5,13 @@
             "Limit Roles": "Off",
             "Game Mode Start": "Immediately"
         },
-        "Hybrid": {
+
+        "Escort": {
             "Enabled": true,
-            "Enabled Maps": [ "Eichenwalde" ],
-            "Capture Speed Modifier": 500
+            "Enabled Maps": [ "Dorado" ],
+            "Competitive Rules": true
         }
+        
     },
     "Heroes": {
         "General": {
