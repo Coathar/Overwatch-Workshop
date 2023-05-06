@@ -1,0 +1,66 @@
+import "workshop-island-settings.json";
+
+globalvar define ana;
+globalvar define junkrat;
+globalvar define pharah;
+
+rule: 'init'
+Event.OngoingGlobal
+{
+    junkrat = CreateDummyBot(Hero.Junkrat, Team.Team2, 0, Vector());
+    SetMoveSpeed(junkrat, 0);
+
+    SetDamageReceived(junkrat, 500);
+
+    pharah = CreateDummyBot(Hero.Pharah, Team.Team2, 1, Vector(0, 0, 5));
+    ana = CreateDummyBot(Hero.Ana, Team.Team1, 1, Vector(0, 0, -5));
+}
+
+rule: 'start'
+Event.OngoingPlayer
+Team.Team1
+if (IsButtonHeld(EventPlayer(), Button.Interact))
+{
+    SetUltimateCharge(junkrat, 100);
+
+    PressButton(junkrat, Button.Ultimate);
+    Wait(2, WaitBehavior.IgnoreCondition);
+    Teleport(junkrat, Vector(5, 0, 0));
+}
+
+rule: 'deflect'
+Event.OngoingPlayer
+Team.Team1
+if (IsButtonHeld(EventPlayer(), Button.Ability2))
+{
+    PressButton(pharah, Button.PrimaryFire);
+}
+
+
+rule: 'kill junkrat tire'
+Event.OngoingPlayer
+Team.Team1
+if (IsButtonHeld(EventPlayer(), Button.Melee))
+{
+    SetFacing(ana, VectorTowards(ana, Vector(1, -0.5, 0)), Relative.ToWorld);
+    Wait(0.5, WaitBehavior.IgnoreCondition);
+    PressButton(ana, Button.PrimaryFire);
+}
+
+rule: 'On Respawn'
+Event.OngoingPlayer
+Team.Team2
+Player.Slot0
+if (IsAlive(EventPlayer()))
+{
+    Teleport(EventPlayer(), Vector());
+}
+
+rule: 'On Respawn'
+Event.OngoingPlayer
+Team.Team2
+Player.Slot0
+if (!IsAlive(EventPlayer()))
+{
+    Respawn(EventPlayer());
+}
