@@ -1,19 +1,20 @@
 import "workshop-island-settings.json";
 
 globalvar define ana;
-globalvar define junkrat;
+globalvar define dva;
+globalvar define bap;
 globalvar define pharah;
 
 rule: 'init'
 Event.OngoingGlobal
 {
-    junkrat = CreateDummyBot(Hero.Junkrat, Team.Team2, 0, Vector());
-    SetMoveSpeed(junkrat, 0);
+    dva = CreateDummyBot(Hero.Soldier76, Team.Team2, 0, Vector());
+    bap = CreateDummyBot(Hero.Baptiste, Team.Team2, 1, Vector(5, 0, 5));
 
-    SetDamageReceived(junkrat, 500);
-
-    pharah = CreateDummyBot(Hero.Pharah, Team.Team2, 1, Vector(0, 0, 5));
-    ana = CreateDummyBot(Hero.Ana, Team.Team1, 1, Vector(0, 0, -5));
+    SetDamageReceived(dva, 1000);
+    SetDamageDealt(dva, 0);
+    pharah = CreateDummyBot(Hero.Pharah, Team.Team2, 2, Vector(0, 0, 5));
+    // ana = CreateDummyBot(Hero.Ana, Team.Team1, 1, Vector(0, 0, -5));
 }
 
 rule: 'start'
@@ -21,11 +22,10 @@ Event.OngoingPlayer
 Team.Team1
 if (IsButtonHeld(EventPlayer(), Button.Interact))
 {
-    SetUltimateCharge(junkrat, 100);
+    SetUltimateCharge(dva, 100);
 
-    PressButton(junkrat, Button.Ultimate);
-    Wait(2, WaitBehavior.IgnoreCondition);
-    Teleport(junkrat, Vector(5, 0, 0));
+    PressButton(dva, Button.Ability1);
+    SetFacing(dva, Vector(0, -10, 0), Relative.ToWorld);
 }
 
 rule: 'deflect'
@@ -33,7 +33,11 @@ Event.OngoingPlayer
 Team.Team1
 if (IsButtonHeld(EventPlayer(), Button.Ability2))
 {
+    SetFacing(pharah, VectorTowards(PositionOf(pharah), PositionOf(EventPlayer())), Relative.ToWorld);
+    Wait(0.1);
     PressButton(pharah, Button.PrimaryFire);
+    Wait(0.5);
+    DestroyDummyBot(Team.Team1, 1);
 }
 
 
@@ -42,9 +46,30 @@ Event.OngoingPlayer
 Team.Team1
 if (IsButtonHeld(EventPlayer(), Button.Melee))
 {
-    SetFacing(ana, VectorTowards(ana, Vector(1, -0.5, 0)), Relative.ToWorld);
+    SetFacing(ana, VectorTowards(ana, EventPlayer()), Relative.ToWorld);
     Wait(0.5, WaitBehavior.IgnoreCondition);
     PressButton(ana, Button.PrimaryFire);
+}
+
+rule: 'kill junkrat tire'
+Event.OngoingPlayer
+Team.Team1
+if (IsButtonHeld(EventPlayer(), Button.Reload))
+{
+    SetAbilityCooldown(bap, Button.Ability2, 0);
+    SetFacing(bap, VectorTowards(Vector(0, 1, 0)), Relative.ToWorld);
+    Wait(0.5, WaitBehavior.IgnoreCondition);
+    PressButton(bap, Button.Ability2);
+}
+
+rule: 'kill junkrat tire'
+Event.OngoingPlayer
+Team.Team1
+if (IsButtonHeld(EventPlayer(), Button.Crouch))
+{
+    Wait(3, WaitBehavior.AbortWhenFalse);
+    SetAllowedHeroes(EventPlayer(), AllHeroes().Remove(HeroOf(EventPlayer())));
+    ResetHeroAvailability(EventPlayer());
 }
 
 rule: 'On Respawn'
@@ -62,5 +87,6 @@ Team.Team2
 Player.Slot0
 if (!IsAlive(EventPlayer()))
 {
+    Wait(2, WaitBehavior.IgnoreCondition);
     Respawn(EventPlayer());
 }

@@ -1,0 +1,142 @@
+import "customGameSettings.json";
+
+
+globalvar define cass;
+globalvar define friendlyMei;
+globalvar define reinhardt;
+globalvar define mei;
+globalvar define lucio;
+
+// globalvar define delay = 1;
+
+rule: 'init'
+Event.OngoingGlobal
+{
+    // friendlyMei = CreateDummyBot(Hero.Mei, Team.Team1, 3, Vector(-144.82, -2.86, 22.47));
+    mei = CreateDummyBot(Hero.Mei, Team.Team2, -1, Vector(-144.82, -2.86, 17.53));
+    cass = CreateDummyBot(Hero.Cassidy, Team.Team2, -1, Vector(-144, -3, 11.73), Vector(1, 0.5, 0));
+    SetGravity(cass, 0);
+}
+
+
+// rule: 'init'
+// Event.OngoingGlobal
+// {
+//     friendlyMei = CreateDummyBot(Hero.Mei, Team.Team1, 3, Vector(-144.82, -2.86, 22.47));
+//     cass = CreateDummyBot(Hero.Cassidy, Team.Team1, 1, Vector(-148.10, -3.2, 18.73));
+//     reinhardt = CreateDummyBot(Hero.Reinhardt, Team.Team2, 1, Vector(-136.24, -1.76, 24.16));
+//     mei = CreateDummyBot(Hero.Mei, Team.Team2, 3, Vector(-137, -2.21, 26.38));
+//     lucio = CreateDummyBot(Hero.Lucio, Team.Team2, 2, Vector(-148.70, -2.86, 23.47), Vector(0.13, -.1, -.99));
+
+//     SetRespawnMaxTime(friendlyMei, 0);
+//     SetRespawnMaxTime(cass, 0);
+//     SetRespawnMaxTime(mei, 0);
+//     SetRespawnMaxTime(reinhardt, 0);
+// }
+
+rule: 'start'
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer(), Button.Reload))
+{
+    SetUltimateCharge(mei, 100);
+    Wait();
+    SetFacing(mei, Vector(0.1, 0.05, -0.99), Relative.ToWorld);
+    StartHoldingButton(mei, Button.PrimaryFire);
+    Wait(2.5);
+    StopHoldingButton(mei, Button.PrimaryFire);
+    Wait();
+    SetFacing(mei, Vector(1, -0.5, 0), Relative.ToWorld);
+    Wait();
+
+    PressButton(mei, Button.Ultimate);
+}
+
+rule: 'ultimate'
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer(), Button.Interact))
+{
+    SetUltimateCharge(EventPlayer(), 100);
+}
+
+rule: 'swap hero'
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer(), Button.Melee))
+{
+    Wait(1, WaitBehavior.AbortWhenFalse);
+    SetAllowedHeroes(EventPlayer(), AllHeroes().Remove(HeroOf(EventPlayer())));
+    ResetHeroAvailability(EventPlayer());
+}
+
+rule: 'swap hero'
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer(), Button.PrimaryFire))
+{
+    SetFacing(friendlyMei, DirectionTowards(friendlyMei, EyePosition(EventPlayer())));
+    Wait();
+    PressButton(friendlyMei, Button.SecondaryFire);
+}
+
+// rule: 'swap hero'
+// Event.OngoingPlayer
+// if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHeld(EventPlayer(), Button.PrimaryFire) )
+// {
+//     delay++;
+// }
+
+// rule: 'swap hero'
+// Event.OngoingPlayer
+// if (IsButtonHeld(EventPlayer(), Button.Crouch) && IsButtonHeld(EventPlayer(), Button.SecondaryFire) )
+// {
+//     delay--;
+// }
+
+rule: 'hud text'
+Event.OngoingPlayer
+if (IsAlive(EventPlayer()))
+{
+    CreateHudText(EventPlayer(), null, null, PositionOf(EventPlayer()));
+    CreateHudText(EventPlayer(), null, null, FacingDirectionOf(EventPlayer()));
+}
+
+rule: 'Teleport bots on respawn'
+Event.OngoingPlayer
+if (IsAlive(EventPlayer()))
+{
+    //   friendlyMei = CreateDummyBot(Hero.Mei, Team.Team1, 2, Vector(-144.82, -2.86, 22.47));
+    // cass = CreateDummyBot(Hero.Cassidy, Team.Team1, 1, Vector(-148.10, -3.2, 18.73));
+    // reinhardt = CreateDummyBot(Hero.Reinhardt, Team.Team2, 1, Vector(-136.24, -1.76, 24.16));
+    // mei = CreateDummyBot(Hero.Mei, Team.Team2, 2, Vector(-137, -2.21, 26.38));
+
+    if (EventPlayer() == cass) 
+    {
+        Teleport(EventPlayer(), Vector(-144, -3, 11.73));
+        SetGravity(cass, 0);
+    }
+    else if (EventPlayer() == mei) 
+    {
+        Teleport(EventPlayer(), Vector(-137, -2.21, 26.38));
+    }
+    else if (EventPlayer() == friendlyMei)
+    {
+        Teleport(EventPlayer(), Vector(-144.82, -2.86, 22.47));
+    }
+    else if (EventPlayer() == reinhardt) 
+    {
+        Teleport(EventPlayer(), Vector(-136.24, -1.76, 24.16));
+    }
+
+}
+
+rule: 'teleport' 
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer(), Button.Melee)) 
+{
+    Teleport(EventPlayer(), Vector(-147, -3, 25));
+}
+
+rule: 'test'
+Event.OngoingPlayer
+if (EventPlayer() == cass && HasStatus(EventPlayer(), Status.Frozen))
+{
+    SetGravity(cass, 100);
+}
